@@ -38,7 +38,10 @@ con.connect(function(err) {
     if (err) throw err;
     console.log("Database Connected!");
 });
-
+const station_table="CREATE TABLE `tomarrow_land`.`stations` ( `arrival_station` VARCHAR(20) NOT NULL , `arrival_time` VARCHAR(10) NOT NULL , `destination_station` VARCHAR(20) NOT NULL , `destination_time` VARCHAR(10) NOT NULL ) ENGINE = InnoDB;"
+con.query(station_table,()=>{
+    console.log("Stations Table created successfully!")
+})
 app.listen(3000,()=>{
     console.log("Running on port 3000 successfully")
 })
