@@ -6,7 +6,7 @@ const cookieParser=require("cookie-parser")
 const User=require("./models/user")
 const app=express()
 const bcrypt=require('bcryptjs');
-// require('./connection')
+require("./station")
 const mysql = require('mysql'); 
 const con = mysql.createConnection({
     host: "localhost",
@@ -19,19 +19,7 @@ con.connect(function(err) {
     if (err) throw err;
     console.log("Database Connected!");
 });
-// mongoose.connect("mongodb://localhost:27017/API",{
-//     useNewUrlParser:true,
-//     useUnifiedTopology:true,
-// }).then(()=>{
-//     console.log("database connected successfully!")
-// }).catch((error)=>{
-//     console.log("got error while connecting!")
-// })
-const createToken=(id)=>{
-    return jwt.sign({id},"secret",{
-        expiresIn:"20d"
-    });
-}
+
 app.listen(3000,()=>{
     console.log("Running on port 3000 successfully")
 })
@@ -52,7 +40,7 @@ app.post('/app/user',async (req,res)=>{
             console.log(result,"got res")
             // res.send("You have already registered. please login")
             
-            const password= bcrypt.hashSync(req.body.password,req.body.password);
+            const password= bcrypt.hashSync(req.body.password,10);
             const hash=bcrypt.compareSync(req.body.password,password);
             console.log(hash,"00000000")
             // console.log(salt,password)
@@ -60,7 +48,6 @@ app.post('/app/user',async (req,res)=>{
             con.query(q,(err,r)=>{
                 if(err){
                     console.log("Got error while inserting",err)
-                    // throw err
                     res.status(400).send(JSON.stringify({status:err.code,status_code:400}))
                 }
                 else{
@@ -89,9 +76,9 @@ app.post('/app/user/login',async(req,res)=>{
                 // console.log(JSON.stringify(result[0]["password"]))
                 const password=result[0]["password"]
                 const gen=bcrypt.hashSync(req.body.password,10)
-                const auth=bcrypt.compareSync(req.body.password,gen)
-                console.log(auth)
-                if(password===gen){
+                const auth=bcrypt.compareSync(req.body.password,password)
+                console.log(auth,password,gen)
+                if(auth){
                     console.log("You have logged in successfully",auth)
                     res.json({
                         status:"success",
@@ -116,4 +103,9 @@ app.post('/app/user/login',async(req,res)=>{
     }catch(error){
         res.send(error)
     }
+})
+app.get('/app/sites/list/:arrival_station_name/:sort_by_arrival_time',()=>{
+    const sortAT=req.query.sort_by_arrival_time
+    const arrivalST=req.query.arrival_station_name
+    res.json(stations)
 })
