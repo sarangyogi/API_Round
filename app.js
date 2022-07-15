@@ -6,7 +6,26 @@ const cookieParser=require("cookie-parser")
 const User=require("./models/user")
 const app=express()
 const bcrypt=require('bcryptjs');
-require("./station")
+const stations=[ 
+    {
+        "arrival_station": "Borivali",
+        "arrival_time": "9:30 AM",
+        "destination_station": "Kurla",
+        "destination_time": "3:30 PM"
+    },
+    {
+        "arrival_station": "Borivali",
+        "arrival_time": "7:30 AM",
+        "destination_station": "Kandivali",
+        "destination_time": "8:30 AM"
+    },
+    {
+        "arrival_station": "Bandra",
+        "arrival_time": "7:30 AM",
+        "destination_station": "Kurla",
+        "destination_time": "8:30 AM"
+    }
+]
 const mysql = require('mysql'); 
 const con = mysql.createConnection({
     host: "localhost",
@@ -104,8 +123,12 @@ app.post('/app/user/login',async(req,res)=>{
         res.send(error)
     }
 })
-app.get('/app/sites/list/:arrival_station_name/:sort_by_arrival_time',()=>{
-    const sortAT=req.query.sort_by_arrival_time
-    const arrivalST=req.query.arrival_station_name
-    res.json(stations)
+app.get('/app/sites/list/:arrival_station_name/:sort_by_arrival_time',(req,res)=>{
+    const sortAT=req.params.sort_by_arrival_time
+    const arrivalST=req.params.arrival_station_name
+    if(arrivalST){
+        res.json(stations.filter((item)=>item.arrival_station===arrivalST))
+    }else{
+        res.json(stations)
+    }
 })
